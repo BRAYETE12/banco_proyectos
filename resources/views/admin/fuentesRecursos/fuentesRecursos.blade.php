@@ -13,7 +13,7 @@
                         <i class="fas fa-plus"></i>  Agregar
                     </button>
                     <a class="btn btn-primary" href="/ExcelFuentes"  download title="Descargar Excel" >
-                        <i class="fas fa-download"></i>  Descargar
+                        <i class="fas fa-download"></i>  Excel
                     </a>
                 </div>
                 <div class="col-md-5 col-xs-12">

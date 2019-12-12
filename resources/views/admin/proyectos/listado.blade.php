@@ -14,7 +14,7 @@
                         <i class="fas fa-plus"></i>  Agregar
                     </a>
                     <a class="btn btn-primary" href="/ExcelProyectos"  download title="Descargar Excel" >
-                        <i class="fas fa-download"></i>  Descargar
+                        <i class="fas fa-download"></i>  Excel
                     </a>
                 </div>
                 <div class="col-md-5 col-xs-12">
@@ -40,7 +40,10 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Nobre</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Fecha inicio</th>
+                        <th>Fecha fin</th>
                         <th>Valor</th>
                         <th></th>
                     </tr>
@@ -48,7 +51,10 @@
                 <tbody >
                     <tr dir-paginate="item in (proyectos | filter:busqueda) | itemsPerPage: itemsPerPage " >
                         <th scope="row">@{{($index+1)+(__default__currentPage - 1) * cantidadItemsTable}}</th>
+                        <td>@{{item.codigo}}</td>
                         <td>@{{item.nombre}}</td>
+                        <td>@{{item.fecha_inicio}}</td>
+                        <td>@{{item.fecha_fin}}</td>
                         <td>@{{item.valor | currency: '$ ':0}}</td>
                         <td>
                             <a class="btn btn-xs btn-link" href="/proyectos/editar/@{{item.id}}" title="Editar proyecto" >

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('app', 'ng-app=AppProyectos')
 @section('controller','ng-controller=configurarCtrl')
-@section('title', $titulo )
+@section('title', $titulo  )
 
 @section('content')
 

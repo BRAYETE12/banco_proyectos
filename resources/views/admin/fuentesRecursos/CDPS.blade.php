@@ -8,14 +8,13 @@
     <div class="row">
         <div class="col card m-3 p-3 bg-white">
             
-
             <div class="row mt-3">
                 <div class="col-md-3 col-xs-12">
                     <button class="btn btn-success" ng-click="openModalCDP()" title="Crear CDP" >
                         <i class="fas fa-plus"></i>  Agregar
                     </button>
                     <a class="btn btn-primary" href="/ExcelCdps"  download title="Descargar Excel" >
-                        <i class="fas fa-download"></i>  Descargar
+                        <i class="fas fa-download"></i>  Excel
                     </a>
                 </div>
                 <div class="col-md-5 col-xs-12">

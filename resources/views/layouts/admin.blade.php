@@ -220,23 +220,14 @@
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
+      <div class="text-center mt-2">
+        <img src="/img/escudo.png" alt="Escudo"  height="90" >
+      </div>
+      
       <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-        <div class="sidebar-brand-icon rotate-n-15">
-            <i class="fas fa-project-diagram"></i>
-        </div>
-        <div class="sidebar-brand-text mx-3"> SISBANPROYEC </div>
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/dashboard" >
+          <div class="sidebar-brand-text mx-3"> SISBANPROYEC {{env('MUNICIPIO')}} </div>
       </a>
-
-      <!-- Divider -->
-      <hr class="sidebar-divider my-0">
-
-      <!-- Nav Item - Dashboard -->
-      <li class="nav-item active">
-        <a class="nav-link" href="/dashboard">
-          <i class="fas fa-fw fa-tachometer-alt"></i>
-          <span>Dashboard</span></a>
-      </li>
 
       <!-- Divider -->
       <hr class="sidebar-divider">
@@ -366,10 +357,12 @@
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/dashboard" >
+                      <i class="fas fa-tachometer-alt"></i>  Dashboard
+                    </a>
                     <a class="dropdown-item" href="{{ route('logout') }}"
-                        onclick="event.preventDefault();
-                                      document.getElementById('logout-form').submit();">
-                        {{ __('Logout') }}
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();" >
+                        <i class="fas fa-sign-out-alt"></i>  Cerra sesión
                     </a>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                         @csrf

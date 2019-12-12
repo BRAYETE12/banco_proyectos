@@ -7,8 +7,8 @@
     
         <div class="col">
             <p class="p-5 text-center">
-                <i class="fas fa-project-diagram mb-2" style="font-size: 5rem;" ></i> <br>
-                Bienvenido a <b>SISBANPROYEC</b>, el sistema de información para banco de proyectos
+                <img src="/img/escudo.png" alt="Escudo" > <br><br>
+                Bienvenido a <b>SISBANPROYEC {{env('MUNICIPIO')}}</b>, el sistema de información para banco de proyectos
             </p>        
         </div>
         <div class="col">

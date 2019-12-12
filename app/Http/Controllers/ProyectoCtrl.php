@@ -24,7 +24,8 @@ class ProyectoCtrl extends Controller
         return View("admin.proyectos.configurar", [ "id"=>0, "titulo"=> 'Crear proyecto']);
     }
     public function Editar($id){
-        return View("admin.proyectos.configurar", [ "id"=>$id, "titulo"=> 'Editar proyecto' ]);
+        $cod = DB::select("select codigo from vista_proyectos where id=".$id)[0]->codigo;
+        return View("admin.proyectos.configurar", [ "id"=>$id, "titulo"=> 'Editar proyecto - '. $cod ]);
     }
 
     public function Listado(){
@@ -33,7 +34,7 @@ class ProyectoCtrl extends Controller
 
     public function getDataListado(){
         return json_encode( [
-            "proyectos"=> Proyecto::where('estado',true)->get(),
+            "proyectos"=> DB::select("select id, codigo, nombre,  fecha_inicio, fecha_fin, fecha_radicacion, valor_solicitado as valor from vista_proyectos"),
         ] );
     }
 
@@ -48,7 +49,7 @@ class ProyectoCtrl extends Controller
             "ejecucion"=> Proyecto_ejecucion::where([ ["proyecto_id",$id], ['estado',true] ])->get(),
             "cdps"=> DB::select("select *from proyectos_financiados where proyectos_id = ".$id),
             "roles"=> Roles_proyecto::get(),
-            "tiposDocumentos"=> tipos_documento::get(),
+            "tiposDocumentos"=> tipos_documento::get(),            
         ] );
     }
 
@@ -75,7 +76,22 @@ class ProyectoCtrl extends Controller
         */
         
 
-        $proyecto = Proyecto::updateOrCreate( [ "id"=>$request->id, "estado"=>true ], $request->all() );
+        $proyecto = Proyecto::find($request->id);
+
+        if($proyecto == null){
+            $proyecto = new Proyecto();
+            $proyecto->estado = true;
+            $numero = Proyecto::where('estado',1)->whereRaw("YEAR(fecha_radicacion) = YEAR('".$request->fecha_radicacion."')")->max("numero");
+            $proyecto->numero = $numero + 1;
+        }
+
+        $proyecto->nombre = $request->nombre;
+        $proyecto->cuerpo = $request->cuerpo;
+        $proyecto->fecha_radicacion = $request->fecha_radicacion;
+        $proyecto->fecha_inicio = $request->fecha_inicio;
+        $proyecto->fecha_fin = $request->fecha_fin;
+        $proyecto->valor = $request->valor;
+        $proyecto->save();
 
         return [ "success"=>true, "id"=>$proyecto->id ];
     }
