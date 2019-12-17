@@ -17,6 +17,7 @@
 
 @section('style')
     <style> 
+    .alert{ display: none; }
     </style>
 @endsection
 

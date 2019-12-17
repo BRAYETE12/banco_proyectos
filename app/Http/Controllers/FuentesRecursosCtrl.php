@@ -36,7 +36,7 @@ class FuentesRecursosCtrl extends Controller
             'tipos_fuentes_id' => 'required|exists:tipos_fuentes,id', 
             'nombre' => 'required',
             'anio' => 'required', 
-            'valor' => 'required', 
+            'valor' => 'required',
          ],[
             'nombre.required' => 'El campo nombre es requerido',
             'anio.required' => 'El campo año es requerido',

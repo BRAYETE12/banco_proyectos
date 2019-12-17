@@ -40,6 +40,8 @@
 
         if (!$scope.formGenral.$valid) { return; }
 
+        $scope.errores = null;
+
         Servi.guardarGeneralProyecto($scope.proyecto)
         .then(function (data) {
             if (data.success) {

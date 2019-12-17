@@ -379,7 +379,20 @@
         <div class="container-fluid">
 
             <main @yield('app')  @yield('controller') id="main" >
+                
                 @yield('content')
+
+                <div ng-if="errores" class="alert alert-danger" role="alert" style="position: fixed; top: 15%; right: 2%; z-index: 10000;">
+                  <p class="alert-heading m-0"> <strong>Errores</strong> </p>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="position: absolute; right: 15px; top: 15px;">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <hr>
+                  <ul>
+                    <li ng-repeat="e in errores" > @{{e[0]}} </li>
+                  </ul>
+                </div>
+
             </main>
 
         </div>

@@ -14,6 +14,8 @@
 
     $scope.guardarPlanAccion = function () {
 
+        $scope.errores = null;
+        
         var fl = $("#fileDoc")[0];
         if(fl.files.length==0){ return; }
     
