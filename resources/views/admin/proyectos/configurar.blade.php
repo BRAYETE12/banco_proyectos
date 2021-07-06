@@ -88,6 +88,19 @@
                                     <adm-dtp ng-model="proyecto.fecha_fin" name="fecha_fin" ng-required="true" options="optionsDate" ></adm-dtp>
                                 </div>
                             </div>
+                        
+                            <div class="col-xs-12 col-md-4">
+                                <div class="form-group">
+                                    <label for="dependencia_id">Dependencia</label>
+                                    <select class="form-control" name="dependencia_id" id="dependencia_id" ng-model="proyecto.dependencia_id" required >
+                                        <option selected disabled  value="" >Seleccionar</option>
+                                        @foreach ($depen as $item)
+                                            <option value="{{$item->id}}" >{{$item->nombre}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>  
+                        <!--
                             <div class="col-xs-12 col">
                                 <div class="form-group">
                                     <label for="valor">Valor</label>
@@ -99,7 +112,8 @@
                                     <label for=""> </label>
                                     <input type="text" class="form-control" value="@{{ (proyecto.valor||0) | currency: '$ ':0}}" readonly >
                                 </div>
-                            </div>                            
+                            </div>   
+                        -->                         
                         </div>
 
                         
@@ -182,6 +196,8 @@
                                 <th>#</th>
                                 <th>Nombres</th>
                                 <th>Valor</th>
+                                <th>Ejecutado</th>
+                                <th>Disponible</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -190,6 +206,8 @@
                                 <th scope="row">@{{$index+1}}</th>
                                 <td>@{{item.nombre}}</td>
                                 <td>@{{item.valor | currency : '$ ': 0}}</td>
+                                <td>@{{ (item.ejecutado||0) | currency : '$ ': 0}}</td>
+                                <td>@{{ ( item.valor - (item.ejecutado||0)) | currency : '$ ': 0}}</td>
                                 <td>
                                     <button type="button" class="btn btn-xs btn-link" ng-click="openModalPresupuesto(item)" >
                                             <i class="fas fa-edit"></i>
@@ -243,7 +261,7 @@
                                     <button type="button" class="btn btn-xs btn-link" ng-click="openModalEjecucion(item, $index)" >
                                             <i class="fas fa-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-xs btn-link" ng-click="eliminarItemPresupuesto(item.id,$index)" >
+                                    <button type="button" class="btn btn-xs btn-link" ng-click="eliminarItemEjecucion(item.id,$index)" >
                                             <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </td>
@@ -578,7 +596,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
-                                <label >Adjunto (opcional)  <a href="@{{rutaArchivo}}" download class="btn btn-link" ng-show="rutaArchivo" >Descargar archivo</a> </label>
+                                <label >Adjunto   <a href="@{{rutaArchivo}}" download class="btn btn-link" ng-show="rutaArchivo" >Descargar archivo</a> </label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="inputGroupFileAddon02">Upload</span>
@@ -621,6 +639,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
@@ -639,7 +658,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label for="itemDescripcion">Descripción</label>
-                                    <textarea type="text" class="form-control" ng-model="itemPresupuesto.descripcion" id="itemDescripcion" name="itemDescripcion" rows="5" placeholder="Descripción (opcional)" >
+                                    <textarea type="text" class="form-control" ng-model="itemPresupuesto.descripcion" id="itemDescripcion" name="itemDescripcion" rows="5" placeholder="Descripción " >
                                     </textarea>
                                 </div>
                             </div>
@@ -675,6 +694,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!--
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
@@ -688,21 +709,69 @@
                                 </div>
                             </div>
                         </div>
+                        -->
 
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
                                     <label for="itemDescripcion">Descripción</label>
-                                    <textarea type="text" class="form-control" ng-model="itemEjecucion.descripcion" id="itemDescripcion" name="itemDescripcion" rows="5" placeholder="Descripción (opcional)" >
+                                    <textarea type="text" class="form-control" ng-model="itemEjecucion.descripcion" id="itemDescripcion" name="itemDescripcion" rows="4" placeholder="Descripción " >
                                     </textarea>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <h4>
+                                    Afectación del presupuesto
+                                    <button class="btn btn-sm btn-primary" type="button" ng-click="itemEjecucion.valores.push({})" >
+                                        Agregar item
+                                    </button>
+                                </h4>
+
+                                <table class="table">
+                                    <thead>
+                                      <tr>
+                                        <th>Rubro</th>
+                                        <th>Disponible</th>
+                                        <th>Valor</th>
+                                        <th></th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr ng-repeat="it in itemEjecucion.valores" >
+                                        <th>
+                                            <select class="form-control" name="" ng-model="it.rubro" ng-change="it.id=it.rubro.id" ng-options="it as it.nombre for it in presupuesto" required >
+                                                <option selected disabled value >Selecione una opción</option>
+                                            </select>
+                                        </th>
+                                        <td>@{{ ( it.rubro.valor - (it.rubro.ejecutado||0)) | currency : '$ ': 0}}</td>
+                                        <td>
+                                            <input type="number" class="form-control" name="" ng-model="it.valor" placeholder="Valor" max="@{{ ( it.rubro.valor - (it.rubro.ejecutado||0))}}" required>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-xs btn-link" style="color:red" ng-click="itemEjecucion.valores.splice($index,1)" >
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  <div class="alert alert-info" ng-show="itemEjecucion.valores.length==0" >
+                                      No hay afectación del presupuesto
+                                  </div>
+
+                            </div>
+                            <div class="col-md-12">
+                                <hr>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label >Adjunto (opcional)  <a href="@{{rutaArchivo}}" download class="btn btn-link" ng-show="rutaArchivo" >Descargar archivo</a> </label>
+                                    <label >Adjunto   <a href="@{{rutaArchivo}}" download class="btn btn-link" ng-show="rutaArchivo" >Descargar archivo</a> </label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text" id="inputGroupFileAddon015">Upload</span>

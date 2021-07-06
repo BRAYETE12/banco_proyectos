@@ -47,6 +47,7 @@
         eliminarDocumentoProyecto: function (data) { return http.post('/proyectos/eliminarDocumento', data); },
         eliminarIntegranteProyecto: function (data) { return http.post('/proyectos/eliminarIntegrante', data); },
         eliminarItemPresupuestoProyecto: function (data) { return http.post('/proyectos/eliminarItemPresupuesto', data); },
+        eliminarItemEjecucion: function (data) { return http.post('/proyectos/eliminarItemEjecucion', data); },
           
       };
       

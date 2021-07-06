@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="https://sisbanproyec.com/icon.ico">
     
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -231,6 +232,29 @@
 
       <!-- Divider -->
       <hr class="sidebar-divider">
+
+      <li class="nav-item">
+        <a class="nav-link" href="/manual-usuario.pdf" target="_blank">
+          <i class="fas fa-book-reader"></i>
+          <span>Manual de usuario</span></a>
+      </li>
+
+      @if ( Auth::user()->rol_id == 1 )
+        <li class="nav-item">
+          <a class="nav-link" href="/Usuarios">
+            <i class="fas fa-users"></i>
+            <span>Usuarios</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/Dependencias">
+            <i class="fas fa-sitemap"></i>
+            <span>Dependencias</span></a>
+        </li>
+        <hr class="sidebar-divider">
+      @endif
+
+      
+
 
       <!-- Heading -->
       <div class="sidebar-heading">

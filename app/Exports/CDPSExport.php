@@ -14,7 +14,7 @@ class CDPSExport implements FromCollection, WithHeadings, ShouldAutoSize
     */
     public function collection()
     {
-        $campos = 'numero, fecha, fuente, valor_inicial, valor_adiccion, valor_disminucion, valor_proyectos, concepto';
+        $campos = 'numero, fecha_creacion, tipo_fuente_financiacion, fuente_financiacion, valor_inicial, valor_adiccion, valor_disminucion, valor_proyectos, concepto';
         return collect( DB::select("select $campos from vista_cdps") );
     }
 
@@ -23,8 +23,9 @@ class CDPSExport implements FromCollection, WithHeadings, ShouldAutoSize
     {
         return [
             'Número',
-            'Fecha',            
-            'Fuente',
+            'Fecha creación',            
+            'Tipo fuente financiación',
+            'fuente financiación',
             'Valor inicial',
             'Valor adiciones',
             'Valor disminuciones',

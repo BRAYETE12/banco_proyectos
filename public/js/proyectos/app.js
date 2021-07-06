@@ -21,7 +21,10 @@
     if( proyecto_id ){
         Servi.getDataProyecto(proyecto_id)
         .then(function (data) {
-            $scope.proyecto = data.proyecto;
+            $scope.proyecto = data.proyecto ? data.proyecto : {};
+            if( data.proyecto){
+                $scope.proyecto.dependencia_id = data.proyecto.dependencia_id+'';
+            }
             $scope.documentos = data.documentos;
             $scope.bitacoras = data.bitacoras;
             $scope.integrantes = data.integrantes;
@@ -154,13 +157,26 @@
 
         if (!$scope.ejecucionForm.$valid) { return; }
 
+        if ( $scope.itemEjecucion.valores.length==0 ) { return; }
+
         var fl = $("#fileDocEjecucion")[0];
         if(fl.files.length==0){ return; }
     
         var fd = new FormData(); 
         for(var item in $scope.itemEjecucion){
             if($scope.itemEjecucion[item]){
+               if(item=='valores'){
+                    var valor = 0;
+                    for(var i=0; i<$scope.itemEjecucion.valores.length; i++ ){
+                        fd.append( "valores["+i+"][id]" , $scope.itemEjecucion.valores[i].id );
+                        fd.append( "valores["+i+"][valor]" , $scope.itemEjecucion.valores[i].valor );    
+                        valor = valor + $scope.itemEjecucion.valores[i].valor;
+                    }
+                    fd.append( "valor" , valor );
+               }
+               else{
                 fd.append( item , $scope.itemEjecucion[item] );
+               }
             }
         }
 
@@ -170,8 +186,12 @@
             .then(function (data) {
                 if (data.success) {
                     swal("Guardado", "Datos guardados exitosamente.", "success");
+                    
                     if($scope.itemEjecucion.id){ $scope.ejecucion[$scope.index] = data.item; }
                     else{ $scope.ejecucion.push(data.item); }
+
+                    $scope.presupuesto = data.presupuesto;
+
                     $(".modal").modal("hide");
                 }
                 else {
@@ -205,6 +225,12 @@
                     
         var dt = { id : id };
         $scope.eliminarElemento('eliminarItemPresupuestoProyecto', dt, 'presupuesto', index);
+    } 
+
+    $scope.eliminarItemEjecucion = function(id, index){
+                    
+        var dt = { id : id };
+        $scope.eliminarElemento('eliminarItemEjecucion', dt, 'ejecucion', index);
     } 
 
     $scope.eliminarElemento = function(metodo, data, array, index){
@@ -284,7 +310,18 @@
     }
 
     $scope.openModalEjecucion = function (item,index) {
-        $scope.itemEjecucion = item ? angular.copy(item) : { proyecto_id: proyecto_id };
+        $scope.itemEjecucion = item ? angular.copy(item) : { proyecto_id: proyecto_id, valores: [{}] };
+
+        for(var i=0; i<$scope.itemEjecucion.valores.length; i++){
+            if( $scope.itemEjecucion.valores[i].id ){
+                $scope.itemEjecucion.valores[i].id = parseInt($scope.itemEjecucion.valores[i].id);
+                $scope.itemEjecucion.valores[i].rubro = getRubro($scope.itemEjecucion.valores[i].id);
+            }
+            if( $scope.itemEjecucion.valores[i].valor ){
+                $scope.itemEjecucion.valores[i].valor = parseInt($scope.itemEjecucion.valores[i].valor);
+            }
+        }
+
         $scope.rutaArchivo = item ? item.soporte : null;
         $scope.index = index;
         openModal($scope.ejecucionForm, 'modalEjecucion');
@@ -297,6 +334,13 @@
             form.$submitted = false;
         }        
         $('#'+modal).modal({ keyboard: false });
+   }
+
+   function getRubro(id){
+        for(var i=0; i<$scope.presupuesto.length; i++){
+            if($scope.presupuesto[i].id==id){ return $scope.presupuesto[i]; }
+        }
+        return null;
    }
    
 }])

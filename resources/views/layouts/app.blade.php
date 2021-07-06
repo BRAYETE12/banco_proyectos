@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="es" >
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="https://sisbanproyec.com/icon.ico">
 
     <title>SISBANPROYEC</title>
 
@@ -57,10 +58,13 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="/dashboard" >
+                                        <i class="fas fa-tachometer-alt"></i>  Dashboard
+                                    </a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
+                                        <i class="fas fa-sign-out-alt"></i>  Cerra sesión
                                     </a>
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\models\dependencia;
 use App\models\Persona;
 use App\models\Presupuesto;
 use Storage;
 use File;
 use App\models\Proyecto;
 use App\models\Proyecto_ejecucion;
+use App\models\proyecto_ejecucions_has_presupuesto;
 use App\models\Proyectos_bitacora;
 use App\models\Proyectos_documento;
 use App\models\Proyectos_integrante;
@@ -21,11 +23,13 @@ class ProyectoCtrl extends Controller
     
 
     public function Crear(){
-        return View("admin.proyectos.configurar", [ "id"=>0, "titulo"=> 'Crear proyecto']);
+        $depen = dependencia::get();
+        return View("admin.proyectos.configurar", [ "id"=>0, "titulo"=> 'Crear proyecto', 'depen'=>$depen ]);
     }
     public function Editar($id){
+        $depen = dependencia::get();
         $cod = DB::select("select codigo from vista_proyectos where id=".$id)[0]->codigo;
-        return View("admin.proyectos.configurar", [ "id"=>$id, "titulo"=> 'Editar proyecto - '. $cod ]);
+        return View("admin.proyectos.configurar", [ "id"=>$id, "titulo"=> 'Editar proyecto - '. $cod , 'depen'=>$depen ]);
     }
 
     public function Listado(){
@@ -33,20 +37,37 @@ class ProyectoCtrl extends Controller
     }
 
     public function getDataListado(){
+
+        $sql = "select id, codigo, nombre,  fecha_inicio, fecha_finalizacion, fecha_radicacion, valor_solicitado as valor, estado from vista_proyectos";
+
         return json_encode( [
-            "proyectos"=> DB::select("select id, codigo, nombre,  fecha_inicio, fecha_fin, fecha_radicacion, valor_solicitado as valor from vista_proyectos"),
+            "proyectos"=> DB::select($sql),
         ] );
     }
 
 
     public function getData($id){
+
+
+        $sql_presupuesto = 'SELECT id, nombre, valor,
+                           (select SUM(e.valor) from proyecto_ejecucions_has_presupuestos as e inner join proyecto_ejecucions on proyecto_ejecucions.id=e.proyecto_ejecucions_id and proyecto_ejecucions.estado=1 WHERE e.presupuestos_id=presupuestos.id) as ejecutado
+                        FROM presupuestos where estado=1 and proyecto_id=' . $id;
+
+
+        $ejecuciones = Proyecto_ejecucion::where([ ["proyecto_id",$id], ['estado',true] ])->get();
+             
+        foreach($ejecuciones as &$dt){
+            $dt["valores"] = proyecto_ejecucions_has_presupuesto::where('proyecto_ejecucions_id', $dt->id)->select('presupuestos_id as id', 'valor')->get();
+        }
+
         return json_encode( [
             "proyecto"=> Proyecto::find($id),
             "documentos"=> Proyectos_documento::where([ ["proyecto_id",$id], ['estado',true] ])->get(),
             "bitacoras"=> Proyectos_bitacora::where([ ["proyecto_id",$id], ['estado',true] ])->get(),
             "integrantes"=> Proyectos_integrante::where([ ["proyecto_id",$id], ['estado',true] ])->with(["rol","persona"])->get(),
-            "presupuesto"=> Presupuesto::where([ ["proyecto_id",$id], ['estado',true] ])->get(),
-            "ejecucion"=> Proyecto_ejecucion::where([ ["proyecto_id",$id], ['estado',true] ])->get(),
+            "presupuesto"=>  DB::select($sql_presupuesto),
+            //Presupuesto::where([ ["proyecto_id",$id], ['estado',true] ])->get(),
+            "ejecucion"=> $ejecuciones,
             "cdps"=> DB::select("select *from proyectos_financiados where proyectos_id = ".$id),
             "roles"=> Roles_proyecto::get(),
             "tiposDocumentos"=> tipos_documento::get(),            
@@ -80,6 +101,7 @@ class ProyectoCtrl extends Controller
 
         if($proyecto == null){
             $proyecto = new Proyecto();
+            $proyecto->estado_id = 1;
             $proyecto->estado = true;
             $numero = Proyecto::where('estado',1)->whereRaw("YEAR(fecha_radicacion) = YEAR('".$request->fecha_radicacion."')")->max("numero");
             $proyecto->numero = $numero + 1;
@@ -90,7 +112,8 @@ class ProyectoCtrl extends Controller
         $proyecto->fecha_radicacion = $request->fecha_radicacion;
         $proyecto->fecha_inicio = $request->fecha_inicio;
         $proyecto->fecha_fin = $request->fecha_fin;
-        $proyecto->valor = $request->valor;
+        //$proyecto->valor = $request->valor;
+        $proyecto->dependencia_id = $request->dependencia_id;
         $proyecto->save();
 
         return [ "success"=>true, "id"=>$proyecto->id ];
@@ -118,10 +141,10 @@ class ProyectoCtrl extends Controller
         
         $validator = \Validator::make($request->all(), [
             'nombre' => 'required',
-            'valor' => 'required',        
+            'valores' => 'required',        
          ],[
             'nombre.required' => 'El campo nombre es requiredo',
-            'valor.required' => 'El campo valor es requiredo',
+            'valores.required' => 'Por favor llene por lo menos un valor',
           ]);
          
         if($validator->fails()){ return [ "success"=>false, "errores"=>$validator->errors() ]; }
@@ -136,8 +159,7 @@ class ProyectoCtrl extends Controller
         $item->nombre = $request->nombre;
         $item->descripcion = $request->descripcion;
         $item->valor = $request->valor;
-
-
+        
         if ($request->archivo) {            
             $fileName = "/proyect_". $request->proyecto_id ."/ejecucion/". time().str_random(5).'.'.$request->archivo->getClientOriginalExtension();
             Storage::disk('filesProyectos')->put( $fileName, File::get($request->archivo));
@@ -146,7 +168,28 @@ class ProyectoCtrl extends Controller
         
         $item->save();
 
-        return [ "success"=>true, "item"=>$item ];
+        proyecto_ejecucions_has_presupuesto::where( 'proyecto_ejecucions_id', $item->id )->delete();
+
+        foreach($request->valores as $v){
+            $it = new proyecto_ejecucions_has_presupuesto();
+            $it->proyecto_ejecucions_id = $item->id;
+            $it->presupuestos_id = $v['id'];
+            $it->valor = $v['valor'];
+            $it->save();
+        }
+
+
+        $sql_presupuesto = 'SELECT id, nombre, valor,
+                           (select SUM(e.valor) from proyecto_ejecucions_has_presupuestos as e inner join proyecto_ejecucions on proyecto_ejecucions.id=e.proyecto_ejecucions_id and proyecto_ejecucions.estado=1 WHERE e.presupuestos_id=presupuestos.id) as ejecutado
+                        FROM presupuestos where estado=1 and proyecto_id=' . $item->proyecto_id;
+
+
+        $presupuesto = DB::select($sql_presupuesto);
+
+
+        $item["valores"] = proyecto_ejecucions_has_presupuesto::where('proyecto_ejecucions_id', $item->id)->select('presupuestos_id as id', 'valor')->get();
+        
+        return [ "success"=>true, "item"=>$item, "presupuesto"=> $presupuesto  ];
     }
 
     public function guardarDocumento(Request $request){
@@ -296,6 +339,19 @@ class ProyectoCtrl extends Controller
         if($itemPresupuesto){
             $itemPresupuesto->estado = false;
             $itemPresupuesto->save();
+            return [ "success"=>true ];
+        }
+        
+        return [ "success"=>false ];
+    }
+
+    public function eliminarItemEjecucion(Request $request){
+        
+        $item = Proyecto_ejecucion::find($request->id);
+
+        if($item){
+            $item->estado = false;
+            $item->save();
             return [ "success"=>true ];
         }
         

@@ -14,7 +14,7 @@ class ProyectosExport implements FromCollection, WithHeadings, ShouldAutoSize
     */
     public function collection()
     {
-        $campos = "codigo,nombre,fecha_radicacion,fecha_inicio,fecha_fin,valor_solicitado,valor_presupuestado,valor_asignado,valor_ejecutado";
+        $campos = "codigo,estado,nombre,fecha_radicacion,fecha_inicio,fecha_finalizacion,valor_solicitado,valor_presupuestado,valor_asignado,valor_ejecutado";
         return collect( DB::select("select $campos from vista_proyectos") );
     }
 
@@ -23,10 +23,11 @@ class ProyectosExport implements FromCollection, WithHeadings, ShouldAutoSize
     {
         return [
             'Código',
+            'Estado',
             'Nombre',
             'Fecha de radicación',
             'Fecha de inicio',
-            'Fecha de fin',
+            'Fecha de finalización',
             'Valor solicitado',
             'Valor presupuestado',
             'Valor asignado',

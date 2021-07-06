@@ -15,6 +15,15 @@ Route::get('/', function () { return view('auth.login'); });
 
 Auth::routes();
 
+Route::get('/Dependencias', 'HomeController@dependencias');
+Route::get('/getDependencias', 'HomeController@getDependencias');
+Route::post('/guardarDependencia', 'HomeController@guardarDependencia');
+
+Route::get('/Usuarios', 'HomeController@usuarios');
+Route::get('/getDataUsuarios', 'HomeController@getDataUsuarios');
+Route::post('/guardarUsuario', 'HomeController@guardarUsuario');
+
+
 Route::get('/dashboard', 'HomeController@dashboard');
 Route::get('/proyectos/listado', 'ProyectoCtrl@Listado');
 Route::get('/proyectos/crear', 'ProyectoCtrl@Crear');
@@ -32,6 +41,7 @@ Route::post('/proyectos/eliminarIntegrante', 'ProyectoCtrl@eliminarIntegrante');
 Route::post('/proyectos/eliminarDocumento', 'ProyectoCtrl@eliminarDocumento');
 Route::post('/proyectos/eliminarBitacora', 'ProyectoCtrl@eliminarBitacora');
 Route::post('/proyectos/eliminarItemPresupuesto', 'ProyectoCtrl@eliminarItemPresupuesto');
+Route::post('/proyectos/eliminarItemEjecucion', 'ProyectoCtrl@eliminarItemEjecucion');
 Route::post('/proyectos/buscarPersona', 'ProyectoCtrl@buscarPersona');
 
 

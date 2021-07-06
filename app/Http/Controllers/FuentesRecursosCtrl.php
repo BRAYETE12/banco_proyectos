@@ -116,9 +116,8 @@ class FuentesRecursosCtrl extends Controller
             $cdp->soporte = "/fuentesFinanciacion". $fileName;
         }
         $cdp->save();
-        $cdp->fuente = $cdp->fuente;
-
-        return [ "success"=>true, "cdp"=> $cdp ];
+        
+        return [ "success"=>true, "cdp"=> collect(DB::select("select *from vista_cdps where id=".$cdp->id ))->first() ];
     }
 
 

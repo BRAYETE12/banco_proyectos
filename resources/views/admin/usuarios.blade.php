@@ -1,7 +1,7 @@
 @extends('layouts.admin')
-@section('app', 'ng-app=AppPlanesAccion')
-@section('controller','ng-controller=listadoCtrl')
-@section('title', 'Listado de fuentes de recursos' )
+@section('app', 'ng-app=AppConfiguracion')
+@section('controller','ng-controller=usuariosCtrl')
+@section('title', 'Listado de usuarios' )
 
 @section('content')
 
@@ -12,9 +12,7 @@
                     <button class="btn btn-success" ng-click="openModalPlanAccion()" title="Crear fuente de recursos" >
                         <i class="fas fa-plus"></i>  Agregar
                     </button>
-                    <a class="btn btn-primary" href="/ExcelFuentes"  download title="Descargar Excel" >
-                        <i class="fas fa-download"></i>  Excel
-                    </a>
+                    
                 </div>
                 <div class="col-md-5 col-xs-12">
                     <div class="form-group">
@@ -39,24 +37,24 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Año</th>
-                        <th>Tipo fuente</th>
-                        <th>Nobre</th>
-                        <th>Valor</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody ng-init="currentPage=1" >
                     <tr dir-paginate="item in (listado | filter:busqueda) | itemsPerPage: cantidadItemsTable" current-page="currentPage" >
                         <th scope="row">@{{($index+1)+(currentPage - 1) * cantidadItemsTable}}</th>
-                        <td>@{{item.anio}}</td>
-                        <td>@{{item.tipo.nombre}}</td>
-                        <td>@{{item.nombre}}</td>
-                        <td>@{{item.valor | currency: '$ ':0}}</td>
+                        <td>@{{item.name}}</td>
+                        <td>@{{item.email}}</td>
+                        <td>@{{ (roles|filter:{'id':item.rol_id})[0].nombre }}</td>
                         <td>
+                            <!--
                             <button class="btn btn-xs btn-link" ng-click="openModalPlanAccion(item,$index)" title="Editar proyecto" >
                                     <i class="fas fa-edit"></i>
                             </button>
+                            -->
                         </td>
                     </tr>
                 </tbody>
@@ -80,7 +78,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Fuentes de recursos</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Usuarios</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -88,63 +86,37 @@
             <form name="PlanAccionForm" novalidate >
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-xs-12 col-md-4">
-                            <div class="form-group">
-                                <label for="tipo_fuente">Tipo fuente</label>
-                                <select class="form-control" name="tipo_fuente" id="tipo_fuente" ng-model="plan.tipos_fuentes_id" ng-options="i.id as i.nombre for i in tipos" required >
-                                    <option selected disabled  value="" >Seleccionar</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-md-8">
+                        <div class="col-xs-12 col-md-12">
                             <div class="form-group">
                                 <label for="nombre">Nombre</label>
-                                <input type="text" class="form-control" ng-model="plan.nombre" id="nombre" name="nombre" placeholder="Nombre del plan de acción" required>
+                                <input type="text" class="form-control" ng-model="user.name" id="nombre" name="nombre" placeholder="Nombre del usuario" required>
                             </div>
                         </div>                       
                     </div>
 
                     <div class="row">
+                        <div class="col-xs-12 col-md-8">
+                            <div class="form-group">
+                                <label for="nombre">Email</label>
+                                <input type="email" class="form-control" ng-model="user.email" id="nombre" name="nombre" placeholder="Email del usuario" required>
+                            </div>
+                        </div>  
+
                         <div class="col-xs-12 col-md-4">
                             <div class="form-group">
-                                <label for="numero_documento">Año</label>
-                                <input type="number" class="form-control" ng-model="plan.anio" id="anio" name="anio" placeholder="Año" required>
+                                <label for="tipo_fuente">Rol del usuario</label>
+                                <select class="form-control" name="tipo_fuente" id="tipo_fuente" ng-model="user.rol_id" ng-options="i.id as i.nombre for i in roles" required >
+                                    <option selected disabled  value="" >Seleccionar</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="col-xs-12 col-md-4">
-                            <div class="form-group">
-                                <label for="valor">Valor</label>
-                                <input type="number" class="form-control" ng-model="plan.valor" id="valor" name="valor" placeholder="Valor $" required>
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-md-4">
-                            <div class="form-group pt-4">
-                                <h2 class="mt-1">@{{ (plan.valor||0) | currency:'$ ':0 }}</h2>
-                            </div>
-                        </div>
+                        </div>                                             
                     </div>
 
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-                                <label >Soporte <a href="@{{rutaArchivo}}" download class="btn btn-link" ng-show="rutaArchivo" >Descargar archivo</a> </label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
-                                    </div>
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="fileDoc" aria-describedby="inputGroupFileAddon01">
-                                        <label class="custom-file-label" for="fileDoc">Click para seleccionar un archivo file</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     
                 </div>
                 <div class="modal-footer text-center">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success"ng-click="guardarPlanAccion()" >Guardar</button>
+                    <button type="submit" class="btn btn-success"ng-click="guardar()" >Guardar</button>
                 </div>
             </form>
         </div>
@@ -163,6 +135,6 @@
     <script src="{{ asset('js/framework/dirPagination.js') }}"></script>
     <script src="{{ asset('js/framework/ADM-dateTimePicker.min.js') }}"></script>
 
-    <script src="{{ asset('js/fuentesRecursos/app.js') }}"></script>
-    <script src="{{ asset('js/fuentesRecursos/servicios.js') }}"></script>
+    <script src="{{ asset('js/configuracion/app.js') }}"></script>
+    <script src="{{ asset('js/configuracion/servicios.js') }}"></script>
 @endsection

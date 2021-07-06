@@ -1,52 +1,84 @@
-﻿angular.module('AppPlanesAccion', [ 'dirPagination', 'ADM-dateTimePicker', 'ServiciosWeb' ])
+﻿angular.module('AppConfiguracion', [ 'dirPagination', 'ADM-dateTimePicker', 'ServiciosWeb' ])
 
 
-.controller('listadoCtrl', ['$scope', 'Servi', function ($scope, Servi) {
+.controller('usuariosCtrl', ['$scope', 'Servi', function ($scope, Servi) {
 
-    Servi.getListado()
+    Servi.getDataUsuarios()
         .then(function (data) {
-            $scope.listado = data.fuentes;
-            $scope.tipos = data.tipos;
+            $scope.listado = data.listado;
+            $scope.roles = data.roles;
         }).catch(function () {
             swal("Error", "Error en la carga, por favor recarga la página.", "error");
         });
     
 
-    $scope.guardarPlanAccion = function () {
+    $scope.guardar = function () {
 
-        $scope.errores = null;
-        
-        var fl = $("#fileDoc")[0];
-        if(fl.files.length==0){ return; }
     
-        var fd = new FormData(); 
-        for(var item in $scope.plan){
-            if($scope.plan[item]){
-                fd.append( item , $scope.plan[item] );
+        Servi.guardarUsuario($scope.user)
+        .then(function (data) {
+            if (data.success) {
+                swal("Guardado", "Datos guardados exitosamente.", "success");
+                $scope.listado =  data.listado;
+                $(".modal").modal("hide");
             }
-        }
-        
-        fd.append("archivo", fl.files[0] );
-    
-            Servi.guardarPlanAccion(fd)
-            .then(function (data) {
-                if (data.success) {
-                    swal("Guardado", "Datos guardados exitosamente.", "success");
-                    if($scope.plan.id){ $scope.listado[$scope.index] = data.plan; }
-                    else{ $scope.listado.push(data.plan); }
-                    $(".modal").modal("hide");
-                }
-                else {
-                    $scope.errores = data.errores;
-                }
-            }).catch(function () {
-                swal("Error", "Error en la carga, por favor recarga la página.", "error");
-            })
+            else {
+                $scope.errores = data.errores;
+            }
+        }).catch(function () {
+            swal("Error", "Error en la carga, por favor recarga la página.", "error");
+        });
     }
     
     $scope.openModalPlanAccion = function (item,index ) {
-        $scope.plan = item ? angular.copy(item) : {};
+        $scope.user = item ? angular.copy(item) : {};
         $scope.rutaArchivo = item ? item.soporte : null;
+        $scope.index = index;
+        openModal($scope.PlanAccionForm, 'modalPlanAccion');
+    }
+
+    function openModal(form, modal){
+        if(form){
+            form.$setPristine();
+            form.$setUntouched();
+            form.$submitted = false;
+        }        
+        $('#'+modal).modal({ keyboard: false });
+    }
+
+}])
+
+
+.controller('dependenciasCtrl', ['$scope', 'Servi', function ($scope, Servi) {
+
+    Servi.getDependencias()
+        .then(function (data) {
+            $scope.listado = data;
+        }).catch(function () {
+            swal("Error", "Error en la carga, por favor recarga la página.", "error");
+        });
+    
+
+    $scope.guardar = function () {
+
+    
+        Servi.guardarDependencia($scope.dependencia)
+        .then(function (data) {
+            if (data.success) {
+                swal("Guardado", "Datos guardados exitosamente.", "success");
+                $scope.listado =  data.listado;
+                $(".modal").modal("hide");
+            }
+            else {
+                $scope.errores = data.errores;
+            }
+        }).catch(function () {
+            swal("Error", "Error en la carga, por favor recarga la página.", "error");
+        });
+    }
+    
+    $scope.openModalPlanAccion = function (item,index ) {
+        $scope.dependencia = item ? angular.copy(item) : {};
         $scope.index = index;
         openModal($scope.PlanAccionForm, 'modalPlanAccion');
     }

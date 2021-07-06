@@ -46,12 +46,12 @@
                         <th></th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr dir-paginate="item in (listado | filter:busqueda) | itemsPerPage: itemsPerPage " >
-                        <th scope="row">@{{($index+1)+(__default__currentPage - 1) * cantidadItemsTable}}</th>
-                        <td>@{{item.fecha}}</td>
+                <tbody ng-init="currentPage=1" >
+                    <tr dir-paginate="item in (listado | filter:busqueda) | itemsPerPage: cantidadItemsTable" current-page="currentPage"  >
+                        <th scope="row">@{{($index+1)+(currentPage - 1) * cantidadItemsTable}}</th>
+                        <td>@{{item.fecha_creacion}}</td>
                         <td>@{{item.numero}}</td>
-                        <td>@{{item.fuente}}</td>
+                        <td>@{{item.fuente_financiacion}}</td>
                         <td>
                             <a class="btn btn-xs btn-link" ng-show="item.soporte"  href="@{{item.soporte}}" title="Descargar soporte" >
                                 <i class="fas fa-download"></i>
@@ -67,7 +67,7 @@
                 </tbody>
             </table>
 
-            <div class="text-center">
+            <div class="text-center" style="margin: 0 auto;" >
                 <dir-pagination-controls></dir-pagination-controls>
             </div>
             
@@ -195,7 +195,7 @@
                                     <div class="col-xs-12 col-md-12">
                                         <div class="form-group">
                                             <label>Fuente</label>
-                                            <p class="form-control">@{{detalle.fuente}}</p>
+                                            <p class="form-control">@{{detalle.tipo_fuente_financiacion}}: @{{detalle.fuente_financiacion}} </p>
                                         </div>
                                     </div>
                                     <div class="col-xs-12 col-md-4">
@@ -207,7 +207,7 @@
                                     <div class="col-xs-12 col-md-4">
                                         <div class="form-group">
                                             <label>Fecha</label>
-                                            <p class="form-control">@{{detalle.fecha}}</p>
+                                            <p class="form-control">@{{detalle.fecha_creacion}}</p>
                                         </div>
                                     </div>
                                     <div class="col-xs-12 col-md-4">

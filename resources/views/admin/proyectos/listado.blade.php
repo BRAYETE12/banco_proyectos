@@ -44,17 +44,19 @@
                         <th>Nombre</th>
                         <th>Fecha inicio</th>
                         <th>Fecha fin</th>
+                        <th>Estado</th>
                         <th>Valor</th>
                         <th></th>
                     </tr>
                 </thead>
-                <tbody >
-                    <tr dir-paginate="item in (proyectos | filter:busqueda) | itemsPerPage: itemsPerPage " >
-                        <th scope="row">@{{($index+1)+(__default__currentPage - 1) * cantidadItemsTable}}</th>
+                <tbody ng-init="currentPage=1" >
+                    <tr dir-paginate="item in (proyectos | filter:busqueda) | itemsPerPage: cantidadItemsTable" current-page="currentPage" >
+                        <th scope="row">@{{($index+1)+(currentPage - 1) * cantidadItemsTable}}</th>
                         <td>@{{item.codigo}}</td>
                         <td>@{{item.nombre}}</td>
                         <td>@{{item.fecha_inicio}}</td>
-                        <td>@{{item.fecha_fin}}</td>
+                        <td>@{{item.fecha_finalizacion}}</td>
+                        <td>@{{item.estado}}</td>
                         <td>@{{item.valor | currency: '$ ':0}}</td>
                         <td>
                             <a class="btn btn-xs btn-link" href="/proyectos/editar/@{{item.id}}" title="Editar proyecto" >
@@ -70,7 +72,7 @@
                 </tbody>
             </table>
 
-            <div class="text-center">
+            <div class="text-center" style="margin: 0 auto;" >
                 <dir-pagination-controls></dir-pagination-controls>
             </div>
             

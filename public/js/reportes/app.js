@@ -4,9 +4,13 @@
 
     var reporte = $("#reporte").val();
 
+    var derivers = $.pivotUtilities.derivers;
+    var renderers = $.extend($.pivotUtilities.renderers, $.pivotUtilities.plotly_renderers);
+    var opcionesPivo = { rows: [], cols: [], renderers: renderers, hiddenAttributes: ["id", "soporte", "fuentes_id"], };
+
     Servi.get(reporte)
-    .then(function (data) {
-        $("#output").pivotUI( data, { rows: [], cols: [], hiddenAttributes: ["id", "soporte", "fuentes_id"], });
+    .then(function (data) {        
+        $("#output").pivotUI( data, opcionesPivo );
     }).catch(function () {
         swal("Error", "Error en la carga, por favor recarga la página.", "error");
     });
